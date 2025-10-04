@@ -1,7 +1,12 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import db 
+from fastapi import FastAPI,Request
+import uvicorn
+import asyncio
 
+
+app_fastapi = FastAPI()
 
 token= "8049019894:AAHeouPEzeXcJTTVuG00mTcSB9qzGnsIgjY"
 
@@ -87,11 +92,16 @@ async def remove_all_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await update.message.reply_text(message)
     db.close_connection(cnx)
 
+@app_fastapi.post("/webhook")
+async def webhook(request: Request):
+    update = Update.de_json(await request.json(), telegram_app_instance.bot)
+    await telegram_app_instance.process_update(update)
+    return {"status": "ok"}
 
 
 
 
-def main():
+def telegram_app():
     app = ApplicationBuilder().token(token).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
@@ -99,9 +109,20 @@ def main():
     app.add_handler(CommandHandler("add", add_command))
     app.add_handler(CommandHandler("remove", remove_command))
     app.add_handler(CommandHandler("remove_all", remove_all_command))
-   
-    
-    app.run_polling()
+    return app
+
+telegram_app_instance = telegram_app()
+
+async def setup():
+    webhook_url = "https://zona-blae-masterly.ngrok-free.dev/webhook"  # Replace with your actual webhook URL
+    await telegram_app_instance.initialize()
+    await telegram_app_instance.bot.set_webhook(webhook_url)
+    print(f"Webhook set to {webhook_url}")
+
+
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(setup())
+
+
+    uvicorn.run(app_fastapi, host="0.0.0.0", port=8000)
