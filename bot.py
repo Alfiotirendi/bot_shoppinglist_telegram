@@ -8,7 +8,7 @@ import asyncio
 
 app_fastapi = FastAPI()
 
-token= "8049019894:AAHeouPEzeXcJTTVuG00mTcSB9qzGnsIgjY"
+token= ""
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
