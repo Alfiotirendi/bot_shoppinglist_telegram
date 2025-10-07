@@ -1,10 +1,17 @@
 from mysql.connector import (connection)
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
 
 def create_connection():
-    cnx = connection.MySQLConnection(user='root', password='',
-                                     host='127.0.0.1',
-                                     database='spesa')
+    cnx = connection.MySQLConnection(user=DB_USER, password=DB_PASSWORD,
+                                     host=DB_HOST,
+                                     database=DB_NAME)
     if not cnx.is_connected():
         print("Errore di connessione al database.")
         return None
@@ -15,7 +22,7 @@ def close_connection(cnx):
         cnx.close()
 
 def lista (cursor, id):
-    cursor.execute("SELECT oggetto,nome FROM spesa WHERE id_utente = %s", (id,))
+    cursor.execute("SELECT oggetto FROM spesa WHERE id_utente = %s", (id,))
     shop = cursor.fetchall()
     if not shop:
         return []

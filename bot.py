@@ -1,14 +1,19 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import db 
+import db_sqllite as db # Per SQLite
+#import db as db # Per MySQL
 from fastapi import FastAPI,Request
 import uvicorn
 import asyncio
+import os
+from dotenv import load_dotenv
 
 
 app_fastapi = FastAPI()
+load_dotenv()
+token = os.getenv("TELEGRAM_BOT_TOKEN")
 
-token= ""
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
