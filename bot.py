@@ -119,7 +119,11 @@ def telegram_app():
 telegram_app_instance = telegram_app()
 
 async def setup():
-    webhook_url = "https://zona-blae-masterly.ngrok-free.dev/webhook"  # Replace with your actual webhook URL
+    WEBSITE_URL = os.getenv("WEBSITE_URL")
+    if not WEBSITE_URL:
+        raise ValueError("WEBSITE_URL is not set in environment variables.")
+        
+    webhook_url = f"{WEBSITE_URL}/webhook"
     await telegram_app_instance.initialize()
     await telegram_app_instance.bot.set_webhook(webhook_url)
     print(f"Webhook set to {webhook_url}")
